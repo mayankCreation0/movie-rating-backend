@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { rateMovie } = require('../controllers/movie');
 const { usersignup, userlogin, addRating, deleteRating } = require('../controllers/user');
 
 
@@ -35,20 +36,18 @@ userRouter.post('/login', async (req, res) => {
             err: err.message
         })
     }
-
 })
 
-userRouter.post('/ratings/:id', async (req, res) => {
+userRouter.put('/ratings/:id', async (req, res) => {
 
     try {
         const body = req.body;
         const userId = req.params.id
-        const user = await addRating(body, userId);
+        const user = await rateMovie(body, userId);
         res.send({
             data: user
         })
     } catch (err) {
-
         res.status(500).send({
             err: err.message
         })
@@ -65,8 +64,6 @@ userRouter.delete('/ratings/:id', async (req, res) => {
             data: user
         })
     } catch (err) {
-        // console.log(err.message)
-
         res.status(500).send({
             err: err.message
         })
