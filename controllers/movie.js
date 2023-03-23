@@ -13,7 +13,7 @@ const rateMovie = async (body, userId) => {
     // const userId = req.user.id;
     console.log()
     try {
-        // Find the user by ID and check if the movie is already rated
+    
         const user = await userModal.findById(userId);
         const alreadyRated = user.ratedMovies.some((movie) => movie.movieId.toString() === movieId);
 
@@ -28,7 +28,7 @@ const rateMovie = async (body, userId) => {
             return ({ msg: 'Movie not found' });
         }
         const reviewInt = parseInt(review);
-        // Update the movie's average rating and total counting
+
         const totalRatings = movie.totalCounting + 1;
         const currentRating = Math.floor(movie.averageRating).toFixed(1);
         const newRating = ((currentRating * movie.totalCounting) + reviewInt) / totalRatings;
@@ -38,23 +38,11 @@ const rateMovie = async (body, userId) => {
         console.log('reviewInt:', reviewInt);
         console.log('newRating:', newRating);
 
-        // const totalRatings = movie.totalCounting + 1;
-        // const currentRating = movie.averageRating;
-        // const sumOfRatings = ratedMovies.reduce((total, movie) => total + Number(movie.review), 0);
-        // const newRating = (sumOfRatings + Number(review)) / totalCounting;
-
-        // console.log(totalRatings, currentRating , newRating , re)
-
         movie.averageRating = newRating;
         movie.totalCounting = totalRatings;
-
-        // Add the user's review to the movie's reviews array
         movie.rating.push({ userId, review });
-
-        // Save the updated movie document
         await movie.save();
 
-        // Add the rated movie to the user's ratedMovies array
         user.ratedMovies.push({ movieId, review });
         await user.save();
 
@@ -96,7 +84,7 @@ const addReview = async (body, userId) => {
 const deleteMovieRating = async (body , userId) => {
     const { movieId } = body;
     try {
-        // Remove the rating from the ratedMovies array
+    
         const updatedUser = await userModal.findByIdAndUpdate(
             userId,
             {
@@ -117,7 +105,7 @@ const deleteMovieRating = async (body , userId) => {
             return ({ error: 'Movie not found' });
         }
 
-        // Calculate the new totalCounting and averageRating values for the movie
+    
         const ratedMovies = updatedUser.ratedMovies;
         const totalCounting = movie.totalCounting - 1;
         const sumOfRatings = ratedMovies.reduce(
@@ -126,7 +114,7 @@ const deleteMovieRating = async (body , userId) => {
         );
         const averageRating = parseInt(sumOfRatings) / parseInt(totalCounting);
 
-        // Update the movie with the new values
+    
         const updatedMovie = await movieModel.findByIdAndUpdate(
             movieId,
             {
@@ -136,7 +124,7 @@ const deleteMovieRating = async (body , userId) => {
             { new: true }
         );
 
-        // Remove the review from the rating and reviews array of the user with the given userId
+    
         movie.rating = movie.rating.filter((r) => r.userId.toString() !== userId);
         movie.reviews = movie.reviews.filter((r) => r.userId.toString() !== userId);
 

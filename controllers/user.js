@@ -32,31 +32,6 @@ const userlogin = async ({ email, password }) => {
     
     return existinguser
 };
-// const addRating = async ({ movieId, ratings }, userId) => {
-//     const existinguser = await userModel.findOne({ _id: userId });
-//     if (!existinguser) {
-//         throw new Error('User Not Found');
-//     }
-//     const user = await
-//     // const ratedMovies = existinguser.ratedMovies || [];
-//     // let foundIndex;
-//     // ratedMovies.forEach((ele, idx) => {
-//     //     if (ele.movieID == movieId) {
-//     //         foundIndex = idx;
-//     //         return;
-//     //     }
-//     // })
-
-//     // if (foundIndex) {
-//     //     throw new Error('Already Rated Movie');
-//     // }
-
-//     // ratedMovies.push({ movieId, ratings });
-//     // const updatedUser = await userModel.findOneAndUpdate({ _id: userId }, { ratedMovies });
-//     // await updateMovieRating(true, movieId, ratings);
-//     // return updatedUser
-
-// }
 
 const addRating = async (body, userId) => {
     const { movieId, review } = body;
