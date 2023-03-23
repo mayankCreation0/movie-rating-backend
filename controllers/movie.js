@@ -1,5 +1,4 @@
 const mongoose  = require('mongoose')
-// const { findById } = require("../models/movie");
 const movieModel = require("../models/movie")
 const userModal = require("../models/user")
 
@@ -8,26 +7,6 @@ const getMovies = async () => {
     const movies = await movieModel.find({});
     return movies;
 }
-
-// const updateMovieRating = async (increaseRating, movieID, ratings) => {
-//     let movie = await movieModel.findOne({ _id: movieID });
-
-//     let newRating;
-//     let newPeople;
-
-//     if (increaseRating) {
-//         const rating = (movie.averageRating * movie.totalCounting) + ratings;
-//         newPeople = movie.totalCounting + 1;
-//         newRating = (rating / newPeople).toFixed(1);
-//     } else {
-//         const rating = (movie.averageRating * movie.totalCounting) - ratings;
-//         newPeople = movie.totalCounting - 1;
-//         newRating = (rating / newPeople).toFixed(1);
-//     }
-
-//     const updatedMovie = await movieModel.updateOne({ _id: movieID }, { averageRating: newRating, totalCounting: newPeople });
-//     return updatedMovie;
-// }
 
 const rateMovie = async (body, userId) => {
     const { movieId, review } = body;
@@ -48,11 +27,23 @@ const rateMovie = async (body, userId) => {
         if (!movie) {
             return ({ msg: 'Movie not found' });
         }
-
+        const reviewInt = parseInt(review);
         // Update the movie's average rating and total counting
         const totalRatings = movie.totalCounting + 1;
-        const currentRating = movie.averageRating;
-        const newRating = ((parseInt(currentRating) * parseInt(movie.totalCounting)) + parseInt(review)) / parseInt(totalRatings);
+        const currentRating = Math.floor(movie.averageRating).toFixed(1);
+        const newRating = ((currentRating * movie.totalCounting) + reviewInt) / totalRatings;
+
+        console.log('totalRatings:', totalRatings);
+        console.log('currentRating:', currentRating);
+        console.log('reviewInt:', reviewInt);
+        console.log('newRating:', newRating);
+
+        // const totalRatings = movie.totalCounting + 1;
+        // const currentRating = movie.averageRating;
+        // const sumOfRatings = ratedMovies.reduce((total, movie) => total + Number(movie.review), 0);
+        // const newRating = (sumOfRatings + Number(review)) / totalCounting;
+
+        // console.log(totalRatings, currentRating , newRating , re)
 
         movie.averageRating = newRating;
         movie.totalCounting = totalRatings;
@@ -102,9 +93,8 @@ const addReview = async (body, userId) => {
 };
 
 
-const deleteMovieRating = async (body, userId) => {
+const deleteMovieRating = async (body , userId) => {
     const { movieId } = body;
-    // const { userId } = req.body;
     try {
         // Remove the rating from the ratedMovies array
         const updatedUser = await userModal.findByIdAndUpdate(
@@ -121,8 +111,12 @@ const deleteMovieRating = async (body, userId) => {
         if (!updatedUser) {
             return ({ error: 'User not found' });
         }
+
         const movie = await movieModel.findById(movieId);
-        console.log(movie.totalCounting)
+        if (!movie) {
+            return ({ error: 'Movie not found' });
+        }
+
         // Calculate the new totalCounting and averageRating values for the movie
         const ratedMovies = updatedUser.ratedMovies;
         const totalCounting = movie.totalCounting - 1;
@@ -130,7 +124,6 @@ const deleteMovieRating = async (body, userId) => {
             (total, movie) => total + Number(movie.review),
             0
         );
-        console.log(sumOfRatings , totalCounting)
         const averageRating = parseInt(sumOfRatings) / parseInt(totalCounting);
 
         // Update the movie with the new values
@@ -142,6 +135,12 @@ const deleteMovieRating = async (body, userId) => {
             },
             { new: true }
         );
+
+        // Remove the review from the rating and reviews array of the user with the given userId
+        movie.rating = movie.rating.filter((r) => r.userId.toString() !== userId);
+        movie.reviews = movie.reviews.filter((r) => r.userId.toString() !== userId);
+
+        await movie.save();
 
         if (!updatedMovie) {
             return ({ error: 'Movie not found' });
@@ -158,6 +157,7 @@ const deleteMovieRating = async (body, userId) => {
 };
 
 
+
 const getmoviesbyId = async (id) => {
     try {
         const movie = await movieModel.findById(id);
@@ -169,3 +169,5 @@ const getmoviesbyId = async (id) => {
 
 
 module.exports = { getMovies, getmoviesbyId, rateMovie, deleteMovieRating ,addReview}
+
+
