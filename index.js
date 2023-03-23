@@ -12,7 +12,7 @@ app.use(express.json());
 app.use('/users', userRouter);
 app.use('/movies', movieRouter);
 app.get('/', (req, res) => {
-    res.send("Todo App is Live Now")
+    res.send("Movie App is Live Now")
 })
 connect().then(() => {
     console.log("connected to database");
