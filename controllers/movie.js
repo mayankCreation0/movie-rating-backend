@@ -30,7 +30,7 @@ const rateMovie = async (body, userId) => {
         const reviewInt = parseInt(review);
 
         const totalRatings = movie.totalCounting + 1;
-        const currentRating = Math.floor(movie.averageRating).toFixed(1);
+        const currentRating = Math.ceil(movie.averageRating).toFixed(1);
         const newRating = ((currentRating * movie.totalCounting) + reviewInt) / totalRatings;
 
         console.log('totalRatings:', totalRatings);
